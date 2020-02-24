@@ -52,16 +52,8 @@ function parse_player_line($string)
 
 function explode_by_whitespace($string)
 {
-	$pattern = '/[^\s"\']+|"([^"]*)"|\'([^\']*)\'/';
-	$matches = array();
-	$i = 0;
-	$out = array();
-	while( preg_match($pattern, $string, $matches, PREG_OFFSET_CAPTURE, $i) )
-	{
-		array_push($out, $matches[0][0]);
-		$i = $matches[0][1] + strlen($matches[0][0]);
-	}
-	return $out;
+	$pattern = "/[\s,]*\\\"([^\\\"]+)\\\"[\s,]*|" . "[\s,]*'([^']+)'[\s,]*|" . "[\s,]+/";
+	return preg_split($pattern, $string, 0, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 }
 
 ?>
