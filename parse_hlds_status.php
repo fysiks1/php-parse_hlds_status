@@ -9,19 +9,19 @@ function parse_hlds_status($StatusString)
 	*	Parse server parameters
 	*/
 	
-	$matches = array();
-	preg_match("/^hostname\s*:\s*(.*)$/im", $StatusString, $matches);
-	$out['hostname'] = $matches[1];
-	preg_match("/version\s*:\s*(.*)$/im", $StatusString, $matches);
-	$out['version'] = $matches[1];
-	preg_match("/tcp\/ip\s*:\s*(.*)/im", $StatusString, $matches);
-	$out['tcp/ip'] = $matches[1];
-	preg_match("/map\s*:\s*([\w-]+).*$/im", $StatusString, $matches);
-	$out['map'] = $matches[1];
-	preg_match("/players\s*:\s*(\d+).*\((\d+).*\)$/im", $StatusString, $matches);
-	$PlayerCount = $matches[1];
-	$out['maxplayers'] = $matches[2];
+	$params[0] = array("name" => 'hostname',	"pattern" => "^hostname\s*:\s*(.*)$");
+	$params[1] = array("name" => 'version',		"pattern" => "version\s*:\s*(.*)$");
+	$params[2] = array("name" => 'tcp/ip',		"pattern" => "tcp\/ip\s*:\s*(.*)");
+	$params[3] = array("name" => 'map',			"pattern" => "map\s*:\s*([\w-]+).*$");
+	$params[4] = array("name" => 'maxplayers',	"pattern" => "players\s*:\s*(\d+).*\((\d+).*\)$");
 	
+	$matches = array();
+	
+	foreach( $params as $param )
+	{
+		preg_match("/" . $param['pattern'] . "/im", $StatusString, $matches);
+		$out[$param['name']] = $matches[1];
+	}
 	
 	/*
 	*	Parse player data
@@ -44,8 +44,7 @@ function parse_hlds_status($StatusString)
 	$header = explode_by_whitespace(array_shift($PlayerDataArray));
 
 	// Parse player data
-	$PlayerListString = array_slice($PlayerDataArray, 0, $PlayerCount);
-	$PlayerList = array_map('parse_player_line', $PlayerListString);
+	$PlayerList = array_map('parse_player_line', $PlayerDataArray);
 	array_walk($PlayerList, '_combine_array', $header);
 	$out['players'] = $PlayerList;
 	
